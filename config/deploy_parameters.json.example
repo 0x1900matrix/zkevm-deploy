@@ -1,0 +1,20 @@
+{
+ "realVerifier": false,
+ "trustedSequencerURL": "http://zkevm-json-rpc:8123",
+ "networkName": "zkevm",
+ "version": "0.0.1",
+ "trustedSequencer": "0x9A8645c226f7c32B57DF140232445231911C7399",
+ "chainID": 1001,
+ "trustedAggregator": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+ "trustedAggregatorTimeout": 604799,
+ "pendingStateTimeout": 604799,
+ "forkID": 4,
+ "admin": "0x9A8645c226f7c32B57DF140232445231911C7399",
+ "zkEVMOwner": "0x9A8645c226f7c32B57DF140232445231911C7399",
+ "timelockAddress": "0x9A8645c226f7c32B57DF140232445231911C7399",
+ "minDelayTimelock": 10,
+ "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+ "zkEVMDeployerAddress": "0x374e0B9D15b7afDFD0766A059111480bf7797D06",
+ "initialZkEVMDeployerOwner": "0x9A8645c226f7c32B57DF140232445231911C7399",
+ "maticTokenAddress": "0x122C6909fF6Cd1A8175c60104c2B4B2D66A385BF"
+}
