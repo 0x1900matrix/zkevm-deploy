@@ -10,6 +10,7 @@ WORKDIR=$scripts_dir/../../
 
 CONTRACTS=$WORKDIR/zkevm-contracts
 NODE=$WORKDIR/zkevm-node
+BRIDGE=$WORKDIR/zkevm-bridge-service
 
 
 download_binary() {
@@ -43,6 +44,7 @@ deploy_contracts_on_l1() {
     echo "deploy bridge and consensus contract on l1"
     cp $config_dir/deploy_parameters.json $CONTRACTS/deployment/
     cp $config_dir/env $CONTRACTS/.env
+    cp $js_dir/1_createGenesis.js $CONTRACTS/deployment/
     cd $CONTRACTS
     rm deployment/deploy_ongoing.json
     npm run deploy:testnet:ZkEVM:localhost
@@ -54,17 +56,53 @@ run_l2_node() {
     # generate genesis for l2
     cd $scripts_dir
     python l2config.py generate_genesis --deploy_output ../config/deploy_output.json --genesis ../config/genesis.json --output ../config/genesis_l2.json
-    cp $config_dir/genesis_l2.json $NODE/test/test.genesis.config.json
-    # TODO
+    cp $config_dir/genesis_l2.json $NODE/test/config/test.genesis.config.json
+    deployer_priv=$(jq -r '.deployerAccount.privateKey' ${config_dir}/accounts.json)
+    deployer_address=$(jq -r '.deployerAccount.address' ${config_dir}/accounts.json)
+    sed 's/SenderAddress = TODO/SenderAddress = "'${deployer_address}'"/g' ${config_dir}/test.node.config.toml.example > ${config_dir}/test.node.config.toml
+    cp ${config_dir}/test.node.config.toml ${NODE}/test/config/
+    cd $NODE
+    if [ ! -f ./dist/zkevm-node ]; then
+        echo "build zkevm-node"
+        make build
+    fi
+    rm -rf temp.keystore
+    dist/zkevm-node encryptKey -pk ${deployer_priv} --pw testonly -o temp.keystore
+    output_key=$(ls temp.keystore/)
+    echo "sequencer.keystore ${output_key}"
+    cp temp.keystore/${output_key} test/sequencer.keystore
+    cd test
+    make run-db
+    make run-approve-matic
+    make run-zkprover
+    make run-node
+}
+
+prepare_bridge_service() {
+    deployer_priv=$(jq -r '.deployerAccount.privateKey' ${config_dir}/accounts.json)
+    deployer_address=$(jq -r '.deployerAccount.address' ${config_dir}/accounts.json)
+    output_key=$(ls ${NODE}/temp.keystore/)
+    echo "sequencer.keystore ${output_key}"
+    cp ${NODE}/temp.keystore/${output_key} $BRIDGE/test/test.keystore.claimtx
+    cp ${NODE}/temp.keystore/${output_key} $BRIDGE/test/test.keystore.sequencer
+    cp ${config_dir}/config.local.toml ${BRIDGE}/config/
+
+    # TODO: solve setting conflicts (i.e., port)
+    # make run-db-bridge
+    # make run-bridge
+}
+
+run_abi_service() {
+    echo "TODO"
 
 }
 
-
-run_l2_node
-exit 0
 
 download_binary
 run_l1_node
 sleep 10
 
 deploy_contracts_on_l1
+sleep 10
+
+run_l2_node

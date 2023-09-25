@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import toml
 
 import argparse
 
@@ -16,9 +17,6 @@ def parse_argument():
     parser.add_argument("--accounts", type=str, default="../config/accounts.json", help="accounts file")
     parser.add_argument("--output", type=str, help="output path")
     return parser.parse_args()
-
-
-
 
 def generate_genesis(genesis_src, deploy_output, genesis_dst):
     with open(genesis_src, 'r') as openfile:
@@ -39,9 +37,37 @@ def generate_genesis(genesis_src, deploy_output, genesis_dst):
     with open(genesis_dst, 'w') as f:
         f.write(json.dumps(result, indent=2))
     
-    # TODO: generate index.json
-    # with open('../config/index.json', 'w') as f:
-    #     f.write(json.dumps(index, indent=2))
+    # generate abi index.json
+    with open('../config/index.json.example', 'r') as f:
+        index = json.load(f)
+    index['Main']['Contracts']['PolygonZkEVM'] = output['polygonZkEVMAddress']
+    index['Main']['Contracts']['PolygonZkEVMProxy'] = output['polygonZkEVMAddress']
+    index['Main']['Contracts']['PolygonZkEVMBridge'] = output['polygonZkEVMBridgeAddress']
+    index['Main']['Contracts']['PolygonZkEVMBridgeProxy'] = output['polygonZkEVMBridgeAddress']
+    index['Main']['Contracts']['PolygonZkEVMGlobalExitRoot'] = output['polygonZkEVMBridgeAddress']
+    index['Main']['Contracts']['PolygonZkEVMGlobalExitRootProxy'] = output['polygonZkEVMBridgeAddress']
+    index['Main']['Contracts']['ZkEVMWrapper'] = output['maticTokenAddress']
+    for tx in genesis['genesis']:
+        try:
+            if tx['contractName'] == "PolygonZkEVMBridge proxy":
+                index['zkEVM']['Contracts']['PolygonZkEVMBridge'] = tx['address']
+            if tx['contractName'] == "PolygonZkEVMGlobalExitRootL2 proxy":
+                index['zkEVM']['Contracts']['PolygonZkEVMGlobalExitRootL2'] = tx['address']
+        except Exception as e:
+            continue
+
+
+    with open('../config/index.json', 'w') as f:
+        f.write(json.dumps(index, indent=2))
+
+    # generate bridge-serivice config
+    with open('../config/config.local.toml.example', 'r') as f:
+        bridge_config = toml.load(f)
+    bridge_config['NetworkConfig']['PolygonBridgeAddress'] = index['Main']['Contracts']['PolygonZkEVMBridgeProxy']
+    bridge_config['NetworkConfig']['PolygonZkEVMGlobalExitRootAddress'] = index['Main']['Contracts']['PolygonZkEVMGlobalExitRootProxy']
+    bridge_config['NetworkConfig']['L2PolygonBridgeAddresses'] = [index['zkEVM']['Contracts']['PolygonZkEVMBridge']]
+    with open('../config/config.local.toml', 'w') as f:
+        toml.dump(bridge_config, f)
 
 def generate_deploy_parameter(accounts_path, output):
     try:
