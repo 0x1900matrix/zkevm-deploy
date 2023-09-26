@@ -39,9 +39,9 @@ BridgeVersion = "v1"
 
 [NetworkConfig]
 GenBlockNumber = 1
-PolygonBridgeAddress = "0x5F1A59e5Ad3faf570961c717b6AFA08abb5006B1"
-PolygonZkEVMGlobalExitRootAddress = "0x5F1A59e5Ad3faf570961c717b6AFA08abb5006B1"
-L2PolygonBridgeAddresses = [ "0x5F1A59e5Ad3faf570961c717b6AFA08abb5006B1",]
+PolygonBridgeAddress = "0x7455F55Fc9f629CCc0243FEF14d79C6898439076"
+PolygonZkEVMGlobalExitRootAddress = "0x0EB47eBdA1C4519d5Af132e15Dad4A991EB1689D"
+L2PolygonBridgeAddresses = [ "0x7455F55Fc9f629CCc0243FEF14d79C6898439076",]
 
 [ClaimTxManager.PrivateKey]
 Path = "/pk/keystore.claimtxmanager"

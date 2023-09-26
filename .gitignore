@@ -6,6 +6,6 @@ genesis.json
 index.json
 genesis_l2.json
 test.node.config.toml
-config.loca.toml
+config.local.toml
 
 node_modules

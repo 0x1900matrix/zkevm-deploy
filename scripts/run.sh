@@ -46,7 +46,9 @@ deploy_contracts_on_l1() {
     cp $config_dir/env $CONTRACTS/.env
     cp $js_dir/1_createGenesis.js $CONTRACTS/deployment/
     cd $CONTRACTS
-    rm deployment/deploy_ongoing.json
+    if [ -f deployment/deploy_ongoing.json ]; then
+        rm deployment/deploy_ongoing.json
+    fi
     npm run deploy:testnet:ZkEVM:localhost
     cp deployment/deploy_output.json $config_dir/
     cp deployment/genesis.json $config_dir/
@@ -73,8 +75,10 @@ run_l2_node() {
     cp temp.keystore/${output_key} test/sequencer.keystore
     cd test
     make run-db
+    sleep 5
     make run-approve-matic
     make run-zkprover
+    sleep 10
     make run-node
 }
 
@@ -88,14 +92,16 @@ prepare_bridge_service() {
     cp ${config_dir}/config.local.toml ${BRIDGE}/config/
 
     # TODO: solve setting conflicts (i.e., port)
-    # make run-db-bridge
-    # make run-bridge
+    make run-db-bridge
+    make run-bridge
 }
 
 run_abi_service() {
     echo "TODO"
+    cp ${config_dir}/index.json /home/yunpeng/code/gogo/static/network/zkevm/0.0.1/
 
 }
+
 
 
 download_binary
@@ -106,3 +112,5 @@ deploy_contracts_on_l1
 sleep 10
 
 run_l2_node
+prepare_bridge_service
+run_abi_service

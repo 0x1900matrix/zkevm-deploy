@@ -44,8 +44,8 @@ def generate_genesis(genesis_src, deploy_output, genesis_dst):
     index['Main']['Contracts']['PolygonZkEVMProxy'] = output['polygonZkEVMAddress']
     index['Main']['Contracts']['PolygonZkEVMBridge'] = output['polygonZkEVMBridgeAddress']
     index['Main']['Contracts']['PolygonZkEVMBridgeProxy'] = output['polygonZkEVMBridgeAddress']
-    index['Main']['Contracts']['PolygonZkEVMGlobalExitRoot'] = output['polygonZkEVMBridgeAddress']
-    index['Main']['Contracts']['PolygonZkEVMGlobalExitRootProxy'] = output['polygonZkEVMBridgeAddress']
+    index['Main']['Contracts']['PolygonZkEVMGlobalExitRoot'] = output['polygonZkEVMGlobalExitRootAddress']
+    index['Main']['Contracts']['PolygonZkEVMGlobalExitRootProxy'] = output['polygonZkEVMGlobalExitRootAddress']
     index['Main']['Contracts']['ZkEVMWrapper'] = output['maticTokenAddress']
     for tx in genesis['genesis']:
         try:
