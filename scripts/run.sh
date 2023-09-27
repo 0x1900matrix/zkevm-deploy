@@ -11,6 +11,7 @@ WORKDIR=$scripts_dir/../../
 CONTRACTS=$WORKDIR/zkevm-contracts
 NODE=$WORKDIR/zkevm-node
 BRIDGE=$WORKDIR/zkevm-bridge-service
+ABI=$WORKDIR/static
 
 
 download_binary() {
@@ -98,7 +99,7 @@ prepare_bridge_service() {
 
 run_abi_service() {
     echo "TODO"
-    cp ${config_dir}/index.json /home/yunpeng/code/gogo/static/network/zkevm/0.0.1/
+    cp ${config_dir}/index.json $ABI/network/zkevm/0.0.1/
 
 }
 
