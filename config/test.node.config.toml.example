@@ -131,7 +131,7 @@ Factor = 0.5
 DefaultGasPriceWei = 1000000000
 
 [MTClient]
-URI  = "zkevm-prover:50061"
+URI  = "192.168.1.106:50061"
 
 [Executor]
 URI = "zkevm-prover:50071"
