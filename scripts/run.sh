@@ -6,7 +6,7 @@ scripts_dir=$(cd $(dirname $0); pwd)
 js_dir=$scripts_dir/../js
 config_dir=$scripts_dir/../config
 
-WORKDIR=$scripts_dir/../../
+WORKDIR=$scripts_dir/../..
 
 CONTRACTS=$WORKDIR/zkevm-contracts
 NODE=$WORKDIR/zkevm-node
@@ -20,11 +20,28 @@ download_binary() {
         echo "zkevm-node not found, download zkevm-node"
         git clone https://github.com/0xEigenLabs/zkevm-node.git
     fi
+    if [ ! -d $ABI ]; then
+        cd $WORKDIR
+        echo "download static"
+        git clone https://github.com/maticnetwork/static.git
+    fi
     if [ ! -d $CONTRACTS ]; then
         cd $WORKDIR
         echo "zkevm-contracts not found, download zkevm-contracts"
         git clone https://github.com/0xPolygonHermez/zkevm-contracts.git
+        cd zkevm-contracts
+        git checkout v1.1.0-fork.4
+        cd ..
     fi
+    if [ ! -d $BRIDGE ]; then
+        cd $WORKDIR
+        echo "zkevm-bridge not found, download zkevm-bridge-service"
+        git clone https://github.com/0xPolygonHermez/zkevm-bridge-service.git
+        cd zkevm-bridge-service
+        git checkout 81740cee945888e2db351b2fafafc826ad095425
+        cd ..
+    fi
+
 }
 
 run_l1_node() {
@@ -34,6 +51,7 @@ run_l1_node() {
 }
 
 deploy_contracts_on_l1() {
+    set -x
     echo "generate deployer account"
     cd $js_dir
     node generate.js ../config/accounts.json
@@ -53,6 +71,7 @@ deploy_contracts_on_l1() {
     npm run deploy:testnet:ZkEVM:localhost
     cp deployment/deploy_output.json $config_dir/
     cp deployment/genesis.json $config_dir/
+    set +x
 }
 
 run_l2_node() {
@@ -93,25 +112,28 @@ prepare_bridge_service() {
     cp ${config_dir}/config.local.toml ${BRIDGE}/config/
 
     # TODO: solve setting conflicts (i.e., port)
+    cd $BRIDGE
     make run-db-bridge
+    sleep 10
     make run-bridge
 }
 
 run_abi_service() {
     echo "TODO"
+    mkdir -p $ABI/network/zkevm/0.0.1
     cp ${config_dir}/index.json $ABI/network/zkevm/0.0.1/
 
 }
 
 
 
-download_binary
+# download_binary
 run_l1_node
 sleep 10
-
+# # # 
 deploy_contracts_on_l1
 sleep 10
-
+# # # 
 run_l2_node
 prepare_bridge_service
 run_abi_service

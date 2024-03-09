@@ -1,5 +1,10 @@
 IsTrustedSequencer = true
 
+[Eigen]
+Use = false
+Executor = "192.168.1.107:50071"
+StateDB = "192.168.1.107:50061"
+
 [Log]
 Environment = "development" # "production" or "development"
 Level = "debug"
@@ -131,7 +136,7 @@ Factor = 0.5
 DefaultGasPriceWei = 1000000000
 
 [MTClient]
-URI  = "192.168.1.106:50061"
+URI  = "zkevm-prover:50061"
 
 [Executor]
 URI = "zkevm-prover:50071"
